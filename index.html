@@ -1,3 +1,4 @@
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -628,35 +629,22 @@ Papa.parse(CSV_URL, {
    DATA HELPERS
 ------------------------- */
 
-
 function parseSheetDate(value) {
   if (!value) return null;
-
   const text = String(value).trim();
 
-  // Google Sheets dates: MM/DD/YYYY
+  // MM/DD/YYYY
   let match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-
   if (match) {
-    return makeLocalDate(
-      Number(match[3]),
-      Number(match[1]),
-      Number(match[2])
-    );
+    return makeLocalDate(Number(match[3]), Number(match[1]), Number(match[2]));
   }
 
-  // ISO dates: YYYY-MM-DD
+  // YYYY-MM-DD, optionally followed by a timestamp
   match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s].*)?$/);
-
   if (match) {
-    return makeLocalDate(
-      Number(match[1]),
-      Number(match[2]),
-      Number(match[3])
-    );
+    return makeLocalDate(Number(match[1]), Number(match[2]), Number(match[3]));
   }
 
-  // Avoid ambiguous date conversions
   return null;
 }
 
@@ -665,17 +653,14 @@ function makeLocalDate(year, month, day) {
   date.setFullYear(year, month - 1, day);
   date.setHours(12, 0, 0, 0);
 
-  // Reject invalid dates
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== month - 1 ||
-    date.getDate() !== day
-  ) {
+  if (date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day) {
     return null;
   }
-
   return date;
 }
+
 
 function normalizeCategory(value) {
 
@@ -1420,3 +1405,4 @@ document
 
 </body>
 </html>
+```
