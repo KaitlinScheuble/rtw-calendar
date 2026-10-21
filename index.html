@@ -628,33 +628,54 @@ Papa.parse(CSV_URL, {
    DATA HELPERS
 ------------------------- */
 
-function parseSheetDate(value) {
 
+function parseSheetDate(value) {
   if (!value) return null;
 
   const text = String(value).trim();
 
-  let match =
-    text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  // Google Sheets dates: MM/DD/YYYY
+  let match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
 
   if (match) {
-
-    return new Date(
+    return makeLocalDate(
       Number(match[3]),
-      Number(match[1]) - 1,
+      Number(match[1]),
       Number(match[2])
     );
-
   }
 
-  const parsed = new Date(text);
+  // ISO dates: YYYY-MM-DD
+  match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s].*)?$/);
 
-  if (isNaN(parsed.getTime())) return null;
+  if (match) {
+    return makeLocalDate(
+      Number(match[1]),
+      Number(match[2]),
+      Number(match[3])
+    );
+  }
 
-  return parsed;
-
+  // Avoid ambiguous date conversions
+  return null;
 }
 
+function makeLocalDate(year, month, day) {
+  const date = new Date(0);
+  date.setFullYear(year, month - 1, day);
+  date.setHours(12, 0, 0, 0);
+
+  // Reject invalid dates
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+}
 
 function normalizeCategory(value) {
 
